@@ -19,16 +19,11 @@ s = min(h / 705, w / 700)
 car_w = max(20, int(50 * s))
 car_h = max(40, int(100 * s))
 
-# Uploading Road and Music
+# Uploading Road Image
+# (the music is played by the browser from index.html, because pygame's
+# mixer does not work reliably inside the browser)
 road = pygame.image.load("road.png")
 road = pygame.transform.scale(road, (w, h))
-
-try:
-    pygame.mixer.init()
-    pygame.mixer.music.load("music.mp3")
-    pygame.mixer.music.play(-1)
-except Exception as err:
-    print("Music could not be played:", err)
 
 # Uploading Images of Cars
 mycar = pygame.image.load("car.png")
