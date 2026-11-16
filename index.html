@@ -66,7 +66,7 @@
 <script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
 <script>
   const ASSETS = [
-    "road.png", "music.mp3", "car.png", "enemy_car.png",
+    "road.png", "car.png", "enemy_car.png",
     "ddf.png", "dhd.png", "fdf.png", "xuc.png", "xyz.png", "zyz.png"
   ];
 
@@ -76,6 +76,11 @@
   const canvas = document.getElementById("canvas");
 
   let pyodide, source;
+
+  // Music is played by the browser itself (pygame's mixer is unreliable in the browser)
+  const music = new Audio("music.mp3");
+  music.loop = true;
+  music.preload = "auto";
 
   function sizeCanvas() {
     canvas.width = window.innerWidth;
@@ -111,6 +116,8 @@
 
   startBtn.addEventListener("click", async () => {
     overlay.style.display = "none";
+    music.currentTime = 0;
+    music.play().catch((err) => console.error("Music error:", err));
     sizeCanvas();
     pyodide.canvas.setCanvas2D(canvas);
     canvas.focus();
