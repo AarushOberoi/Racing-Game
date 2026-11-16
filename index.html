@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Endless Racing Game!</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+  #canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: block;
+    outline: none;
+  }
+  #overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: #000;
+    color: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    z-index: 10;
+  }
+  #overlay h1 { margin: 0; font-size: clamp(28px, 6vw, 64px); }
+  #status { font-size: clamp(14px, 2vw, 22px); color: #bbb; padding: 0 20px; }
+  #start {
+    display: none;
+    padding: 14px 40px;
+    font-size: clamp(18px, 3vw, 30px);
+    font-weight: bold;
+    color: #000;
+    background: #ffd54f;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  #start:hover { background: #ffca28; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas" tabindex="1"></canvas>
+
+<div id="overlay">
+  <h1>Endless Racing Game!</h1>
+  <div id="status">Loading Python and pygame...</div>
+  <button id="start">Start Game</button>
+  <div style="font-size:14px;color:#888">Use the left and right arrow keys to steer</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+<script>
+  const ASSETS = [
+    "road.png", "music.mp3", "car.png", "enemy_car.png",
+    "ddf.png", "dhd.png", "fdf.png", "xuc.png", "xyz.png", "zyz.png"
+  ];
+
+  const statusEl = document.getElementById("status");
+  const startBtn = document.getElementById("start");
+  const overlay = document.getElementById("overlay");
+  const canvas = document.getElementById("canvas");
+
+  let pyodide, source;
+
+  function sizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  async function prepare() {
+    try {
+      statusEl.textContent = "Loading Python...";
+      pyodide = await loadPyodide();
+
+      statusEl.textContent = "Loading pygame...";
+      await pyodide.loadPackage("pygame-ce");
+
+      statusEl.textContent = "Loading game files...";
+      for (const name of ASSETS) {
+        const res = await fetch(name);
+        if (!res.ok) throw new Error("Could not load " + name);
+        pyodide.FS.writeFile(name, new Uint8Array(await res.arrayBuffer()));
+      }
+      const res = await fetch("main.py");
+      if (!res.ok) throw new Error("Could not load main.py");
+      source = await res.text();
+
+      statusEl.textContent = "Ready!";
+      startBtn.style.display = "inline-block";
+    } catch (err) {
+      statusEl.textContent = "Error: " + err.message +
+        " (open this page through a web server, not by double-clicking the file)";
+      console.error(err);
+    }
+  }
+
+  startBtn.addEventListener("click", async () => {
+    overlay.style.display = "none";
+    sizeCanvas();
+    pyodide.canvas.setCanvas2D(canvas);
+    canvas.focus();
+    try {
+      // main.py is your pygame game; this just starts it
+      await pyodide.runPythonAsync(source + "\nawait main()");
+    } catch (err) {
+      overlay.style.display = "flex";
+      statusEl.textContent = "Game error: " + err.message;
+      console.error(err);
+    }
+  });
+
+  // Keep keyboard focus on the game
+  window.addEventListener("click", () => canvas.focus());
+
+  // The game is sized to the window when it starts, so restart it if the window size changes
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    if (overlay.style.display === "none") {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => location.reload(), 400);
+    }
+  });
+
+  prepare();
+</script>
+</body>
+</html>
