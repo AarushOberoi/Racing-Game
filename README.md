@@ -1,41 +1,49 @@
-# 🧮 Calculator
+# 🏎️ Endless Racing Game!
 
-A calculator written in **Python** that runs entirely in the browser, with an iPhone-style (Apple Calculator) block interface.
+An endless car racing game built with **Python** and **pygame**, running right in your browser. Steer your car, dodge the oncoming traffic, and see how long you can survive.
 
-🔗 **Live site:** https://calculator.aarushoberoi.workers.dev
+🔗 **Play now:** https://racinggame.aarushoberoi.workers.dev
 
 ---
 
+## 🎮 How to Play
+
+1. Open the [live site](https://racinggame.aarushoberoi.workers.dev) and wait for Python and pygame to load.
+2. Click **Start Game**.
+3. Use the **← Left** and **→ Right** arrow keys to steer.
+4. Avoid the enemy cars for as long as you can.
+
 ## ✨ Features
 
-- **Python-powered**: the calculation logic is real Python, executed in the browser (no server needed)
-- **iPhone-style interface**: familiar block layout with round keys
-- **Full basic keypad**
-  - Digits `0–9` and decimal point `.`
-  - Operators `+`, `−`, `×`, `÷`
-  - `C` (clear), `±` (toggle sign), `%` (percentage)
-  - `=` to evaluate
-- **Full-screen layout** that adapts to the viewport, including mobile (`viewport-fit=cover`)
-- **Static deployment** on Cloudflare Workers
+- **Real Python game**: the actual pygame code runs in the browser, with no JavaScript rewrite
+- **Endless gameplay** on a scrolling road
+- **Enemy cars** to dodge
+- **Background music**
+- **Full-page layout** that fills the whole browser window
+- **No install needed**: just open the link and play
 
 ## 🗂️ Project Structure
 
 ```
-Calculator/
-├── index.html            # Website: calculator UI, loads Python in the browser
-└── Requirements/
-    ├── Calculation.py    # Calculation logic
-    ├── Dashboard.py      # Calculator dashboard/interface logic
-    └── Calculator_1.ipynb  # Original notebook version
+Racing-Game/
+├── index.html                  # Web page that loads Python + pygame and launches the game
+├── Endless_Racing_Game.ipynb   # Original notebook version of the game
+├── car.png                     # Player car sprite
+├── enemy_car.png               # Enemy car sprite
+├── road.png                    # Road background
+├── music.mp3                   # Background music
+└── *.png                       # Additional image assets
 ```
 
 ## 🚀 Run Locally
 
-Clone the repo and serve the folder with any static server (opening `index.html` directly may not work, because the browser needs to load Python files over HTTP):
+### In the browser
+
+Serve the folder with any static server (opening `index.html` directly may not work, because the browser needs to load the assets over HTTP):
 
 ```bash
-git clone https://github.com/AarushOberoi/Calculator.git
-cd Calculator
+git clone https://github.com/AarushOberoi/Racing-Game.git
+cd Racing-Game
 
 # Option 1: Python
 python -m http.server 8000
@@ -46,10 +54,11 @@ npx serve .
 
 Then open `http://localhost:8000`.
 
-To use the original notebook instead:
+### As a desktop game
 
 ```bash
-jupyter notebook Requirements/Calculator_1.ipynb
+pip install pygame jupyter
+jupyter notebook Endless_Racing_Game.ipynb
 ```
 
 ## ☁️ Deployment
@@ -62,13 +71,20 @@ npx wrangler deploy
 
 ## 🧠 How It Works
 
-1. The page loads and initialises a Python runtime in the browser.
-2. Button presses on the keypad are passed to the Python calculation logic.
-3. The result is shown on the display.
+1. The page loads a Python runtime with pygame support in the browser.
+2. The game's Python code and its assets (images, music) are loaded.
+3. Clicking **Start Game** runs the game loop, drawing to a canvas that fills the page.
+
+## 🛠️ Built With
+
+- Python
+- pygame
+- HTML / CSS
+- Cloudflare Workers (hosting)
 
 ## 🤝 Contributing
 
-Suggestions and pull requests are welcome:
+Ideas and pull requests are welcome:
 
 1. Fork the repository
 2. Create a branch: `git checkout -b feature/your-feature`
